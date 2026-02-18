@@ -68,7 +68,9 @@ public class PlayerController : MonoBehaviour
         // Update the winText to display "You Lose!"
         winTextObject.gameObject.SetActive(true);
         winTextObject.GetComponent<TextMeshProUGUI>().text = "You Lose!";
-        Destroy(GameObject.FindGameObjectWithTag("Enemy"));
+        GameObject[] gos = GameObject.FindGameObjectsWithTag("Enemy");
+        foreach(GameObject go in gos)
+        Destroy(go);
     }
     }
 
