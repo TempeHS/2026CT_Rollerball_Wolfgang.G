@@ -61,16 +61,25 @@ public class PlayerController : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-    if (collision.gameObject.CompareTag("Enemy"))
+        if (collision.gameObject.CompareTag("Enemy"))
     {
-        // Destroy the current object
-        Destroy(gameObject); 
-        // Update the winText to display "You Lose!"
-        winTextObject.gameObject.SetActive(true);
-        winTextObject.GetComponent<TextMeshProUGUI>().text = "You Lose!";
-        GameObject[] gos = GameObject.FindGameObjectsWithTag("Enemy");
-        foreach(GameObject go in gos)
-        Destroy(go);
+            
+            Destroy(gameObject); 
+            winTextObject.gameObject.SetActive(true);
+            winTextObject.GetComponent<TextMeshProUGUI>().text = "You Lose!";
+            GameObject[] gos = GameObject.FindGameObjectsWithTag("Enemy");
+            foreach(GameObject go in gos)
+            Destroy(go);
+    }
+
+        if (collision.gameObject.CompareTag("DeathBox"))
+    {
+            Destroy(gameObject); 
+            winTextObject.gameObject.SetActive(true);
+            winTextObject.GetComponent<TextMeshProUGUI>().text = "You Lose!";
+            GameObject[] gos = GameObject.FindGameObjectsWithTag("Enemy");
+            foreach(GameObject go in gos)
+            Destroy(go);
     }
     }
 
