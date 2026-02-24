@@ -1,12 +1,13 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using TMPro;
+using System.Collections;
 
 
 public class PlayerController : MonoBehaviour
 {
     public float TrueSpeed = 0;
-    public float speed = TrueSpeed; 
+    public float speed; 
     public TextMeshProUGUI countText;
     public GameObject winTextObject;
     private Rigidbody rb; 
@@ -18,6 +19,7 @@ public class PlayerController : MonoBehaviour
     {
         rb = GetComponent <Rigidbody>(); 
         count = 0; 
+        speed = TrueSpeed;
         SetCountText ();
         winTextObject.SetActive(false);
     }
@@ -68,7 +70,6 @@ public class PlayerController : MonoBehaviour
         speed = speed * 2;
         yield return new WaitForSeconds(3f);
         speed = TrueSpeed;
-        StopCoroutine(WaitAndDeactivate);
 
     }
 
