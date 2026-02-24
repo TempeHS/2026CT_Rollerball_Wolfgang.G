@@ -44,9 +44,9 @@ public class PlayerController : MonoBehaviour
 
     private void FixedUpdate() 
    {
-    Vector3 movement = new Vector3 (movementX, 0.0f, movementY);
-    rb.AddForce(movement * speed); 
-   
+        Vector3 movement = new Vector3 (movementX, 0.0f, movementY);
+        rb.AddForce(movement * speed); 
+        StartCoroutine(SpawnEnemies());
    }
 
     void OnTriggerEnter(Collider other) 
@@ -72,6 +72,14 @@ public class PlayerController : MonoBehaviour
         speed = TrueSpeed;
 
     }
+        
+    IEnumerator SpawnEnemies()
+    {
+        yield return new WaitForSeconds(30f);
+
+
+    }
+
 
     private void OnCollisionEnter(Collision collision)
     {

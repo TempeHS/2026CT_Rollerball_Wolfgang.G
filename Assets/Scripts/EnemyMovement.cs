@@ -10,16 +10,27 @@ public class EnemyMovement : MonoBehaviour
     void Start()
     {
         navMeshAgent = GetComponent<NavMeshAgent>();
-
+        if (player == null)
+        {
+            GameObeject p = GameObject.FindWithTag("Player");
+            if (p != null)
+            {
+                player = p.transform;
+            }
+        }
+        GameObject playerObj = GameObject.FindWithTag("Player");
         
     }
 
 
     void Update()
     {
-        if(player != null)
+        if(player == null)
         {
-            navMeshAgent.SetDestination(player.position);
+            GameObeject p = GameObject.FindWithTag("Player");
+            if (p != null)
+            navMeshAgent.SetDestination(GameObject.FindWithTag("Player"));
+        
         }
         
     }
