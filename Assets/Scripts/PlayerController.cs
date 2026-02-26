@@ -10,15 +10,19 @@ public class PlayerController : MonoBehaviour
     public float speed; 
     public TextMeshProUGUI countText;
     public GameObject winTextObject;
+    public GameObject Enemy;
     private Rigidbody rb; 
     private int count;
+    private int delayedCount;
     private float movementX;
     private float movementY;
+
     
     void Start()
     {
         rb = GetComponent <Rigidbody>(); 
-        count = 0; 
+        count = 0;
+        delayedCount = count; 
         speed = TrueSpeed;
         SetCountText ();
         winTextObject.SetActive(false);
@@ -55,6 +59,11 @@ public class PlayerController : MonoBehaviour
             other.gameObject.SetActive(false);
             count = count + 1;
             SetCountText ();
+            if (count == delayedCount + 10)
+            {
+                Instantiate(Enemy, new Vector3(0, 0, 0), Quaternion.identity);
+                delayedCount = count;
+            }
         }
 
         if (other.gameObject.CompareTag("SpeedPickUp")) 
