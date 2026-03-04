@@ -61,7 +61,7 @@ public class PlayerController : MonoBehaviour
             SetCountText ();
             if (count == delayedCount + 10)
             {
-                Instantiate(Enemy, new Vector3(0, 0, 0), Quaternion.identity);
+                Instantiate(Enemy, new Vector3(0, 4, 0), Quaternion.identity);
                 delayedCount = count;
             }
         }
