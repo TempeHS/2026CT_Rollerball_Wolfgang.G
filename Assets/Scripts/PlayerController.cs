@@ -11,9 +11,9 @@ public class PlayerController : MonoBehaviour
     public TextMeshProUGUI countText;
     public GameObject winTextObject;
     public GameObject Enemy;
+    public int count;
+    public int delayedCount;
     private Rigidbody rb; 
-    private int count;
-    private int delayedCount;
     private float movementX;
     private float movementY;
 
@@ -39,7 +39,7 @@ public class PlayerController : MonoBehaviour
    void SetCountText ()
    {
         countText.text = "Count: " + count.ToString();
-        if (count >= 23) 
+        if (count >= 230) 
         {
             winTextObject.SetActive(true);
             Destroy(GameObject.FindGameObjectWithTag("Enemy"));
@@ -57,12 +57,12 @@ public class PlayerController : MonoBehaviour
         if (other.gameObject.CompareTag("PickUp")) 
         {
             other.gameObject.SetActive(false);
-            count = count + 1;
+            count = count + 5;
             SetCountText ();
-            if (count == delayedCount + 10)
+            if (count >= delayedCount + 10)
             {
-                Instantiate(Enemy, new Vector3(0, 4, 0), Quaternion.identity);
                 delayedCount = count;
+                Instantiate(Enemy, new Vector3(0, 1, 0), Quaternion.identity);
             }
         }
 
