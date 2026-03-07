@@ -43,7 +43,7 @@ public class PlayerController : MonoBehaviour
    void SetCountText ()
    {
         countText.text = "Count: " + count.ToString();
-        if (count >= 230) 
+        if (count >= 23) 
         {
             winTextObject.SetActive(true);
             Destroy(GameObject.FindGameObjectWithTag("Enemy"));
@@ -61,7 +61,7 @@ public class PlayerController : MonoBehaviour
         if (other.gameObject.CompareTag("PickUp")) 
         {
             other.gameObject.SetActive(false);
-            count = count + 5;
+            count = count + 1;
             SetCountText ();
             if (count >= delayedCount + 10)
             {
