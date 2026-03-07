@@ -11,6 +11,10 @@ public class PlayerController : MonoBehaviour
     public TextMeshProUGUI countText;
     public GameObject winTextObject;
     public GameObject Enemy;
+    public float enemySpawnY = 1f;
+    public Vector2 enemySpawnXRange = new Vector2(-10f, 10f);
+    public Vector2 enemySpawnZRange = new Vector2(-10f, 10f);
+    public float minEnemySpawnDistanceFromPlayer = 5f;
     public int count;
     public int delayedCount;
     private Rigidbody rb; 
@@ -62,7 +66,7 @@ public class PlayerController : MonoBehaviour
             if (count >= delayedCount + 10)
             {
                 delayedCount = count;
-                Instantiate(Enemy, new Vector3(0, 1, 0), Quaternion.identity);
+                Instantiate(Enemy, GetRandomEnemySpawnPosition(), Quaternion.identity);
             }
         }
 
@@ -79,6 +83,35 @@ public class PlayerController : MonoBehaviour
         yield return new WaitForSeconds(3f);
         speed = TrueSpeed;
 
+    }
+
+    Vector3 GetRandomEnemySpawnPosition()
+    {
+        const int maxAttempts = 20;
+        Vector3 playerPosition = transform.position;
+        Vector3 bestCandidate = new Vector3(playerPosition.x, enemySpawnY, playerPosition.z);
+        float bestDistance = -1f;
+
+        for (int i = 0; i < maxAttempts; i++)
+        {
+            float randomX = Random.Range(enemySpawnXRange.x, enemySpawnXRange.y);
+            float randomZ = Random.Range(enemySpawnZRange.x, enemySpawnZRange.y);
+            Vector3 candidate = new Vector3(randomX, enemySpawnY, randomZ);
+            float distanceToPlayer = Vector3.Distance(candidate, playerPosition);
+
+            if (distanceToPlayer >= minEnemySpawnDistanceFromPlayer)
+            {
+                return candidate;
+            }
+
+            if (distanceToPlayer > bestDistance)
+            {
+                bestDistance = distanceToPlayer;
+                bestCandidate = candidate;
+            }
+        }
+
+        return bestCandidate;
     }
 
 

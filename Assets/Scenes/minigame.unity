@@ -975,6 +975,10 @@ MonoBehaviour:
   countText: {fileID: 1534696510}
   winTextObject: {fileID: 139862832}
   Enemy: {fileID: 1480009805872556163, guid: 8940cefb38f93de4b863386631c2161a, type: 3}
+  enemySpawnY: 1
+  enemySpawnXRange: {x: -20, y: 20}
+  enemySpawnZRange: {x: -20, y: 20}
+  minEnemySpawnDistanceFromPlayer: 5
   count: 0
   delayedCount: 0
 --- !u!114 &273135059
