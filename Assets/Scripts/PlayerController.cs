@@ -30,6 +30,9 @@ public class PlayerController : MonoBehaviour
         speed = TrueSpeed;
         SetCountText ();
         winTextObject.SetActive(false);
+        Instantiate(Enemy, GetRandomEnemySpawnPosition(), Quaternion.identity);
+        Instantiate(Enemy, GetRandomEnemySpawnPosition(), Quaternion.identity);
+        Instantiate(Enemy, GetRandomEnemySpawnPosition(), Quaternion.identity);
     }
 
     void OnMove (InputValue movementValue)
@@ -63,7 +66,7 @@ public class PlayerController : MonoBehaviour
             other.gameObject.SetActive(false);
             count = count + 1;
             SetCountText ();
-            if (count >= delayedCount + 10)
+            if (count >= delayedCount + 4)
             {
                 delayedCount = count;
                 Instantiate(Enemy, GetRandomEnemySpawnPosition(), Quaternion.identity);
