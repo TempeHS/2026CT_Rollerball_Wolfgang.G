@@ -31,7 +31,10 @@ public class PlayerController : MonoBehaviour
         speed = TrueSpeed;
         SetCountText ();
         winTextObject.SetActive(false);
-        GameObject.Find("RestartButton").GetComponentInChildren<Text>().text = "la di da";
+        var restartButton = GameObject.Find("RestartButton");
+        var label = restartButton.GetComponentInChildren<TMP_Text>(true);
+        label.text = "Restart";
+        restartButton.SetActive(false);
         Instantiate(Enemy, GetRandomEnemySpawnPosition(), Quaternion.identity);
         Instantiate(Enemy, GetRandomEnemySpawnPosition(), Quaternion.identity);
         Instantiate(Enemy, GetRandomEnemySpawnPosition(), Quaternion.identity);
