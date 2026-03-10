@@ -33,6 +33,7 @@ public class PlayerController : MonoBehaviour
         Instantiate(Enemy, GetRandomEnemySpawnPosition(), Quaternion.identity);
         Instantiate(Enemy, GetRandomEnemySpawnPosition(), Quaternion.identity);
         Instantiate(Enemy, GetRandomEnemySpawnPosition(), Quaternion.identity);
+
     }
 
     void OnMove (InputValue movementValue)
@@ -66,7 +67,7 @@ public class PlayerController : MonoBehaviour
             other.gameObject.SetActive(false);
             count = count + 1;
             SetCountText ();
-            if (count >= delayedCount + 4)
+            if (count >= delayedCount + 3)
             {
                 delayedCount = count;
                 Instantiate(Enemy, GetRandomEnemySpawnPosition(), Quaternion.identity);
