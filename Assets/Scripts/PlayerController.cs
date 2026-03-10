@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.InputSystem;
 using TMPro;
 using System.Collections;
@@ -30,6 +31,7 @@ public class PlayerController : MonoBehaviour
         speed = TrueSpeed;
         SetCountText ();
         winTextObject.SetActive(false);
+        GameObject.Find("RestartButton").GetComponentInChildren<Text>().text = "la di da";
         Instantiate(Enemy, GetRandomEnemySpawnPosition(), Quaternion.identity);
         Instantiate(Enemy, GetRandomEnemySpawnPosition(), Quaternion.identity);
         Instantiate(Enemy, GetRandomEnemySpawnPosition(), Quaternion.identity);
