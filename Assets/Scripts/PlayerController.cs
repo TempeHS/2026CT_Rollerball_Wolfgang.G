@@ -12,10 +12,11 @@ public class PlayerController : MonoBehaviour
     public TextMeshProUGUI countText;
     public GameObject winTextObject;
     public GameObject Enemy;
-    public float enemySpawnY = 1f;
-    public Vector2 enemySpawnXRange = new Vector2(-10f, 10f);
-    public Vector2 enemySpawnZRange = new Vector2(-10f, 10f);
+    public float enemySpawnY = 0.5f;
+    public Vector2 enemySpawnXRange = new Vector2(-20f, 20f);
+    public Vector2 enemySpawnZRange = new Vector2(-20f, 20f);
     public float minEnemySpawnDistanceFromPlayer = 5f;
+    private GameObject restartButton;
     public int count;
     public int delayedCount;
     private Rigidbody rb; 
@@ -25,20 +26,19 @@ public class PlayerController : MonoBehaviour
     
     void Start()
     {
+        Instantiate(Enemy, GetRandomEnemySpawnPosition(), Quaternion.identity);
+        Instantiate(Enemy, GetRandomEnemySpawnPosition(), Quaternion.identity);
+        Instantiate(Enemy, GetRandomEnemySpawnPosition(), Quaternion.identity);
         rb = GetComponent <Rigidbody>(); 
         count = 0;
         delayedCount = count; 
         speed = TrueSpeed;
         SetCountText ();
         winTextObject.SetActive(false);
-        var restartButton = GameObject.Find("RestartButton");
+        restartButton = GameObject.Find("RestartButton");
         var label = restartButton.GetComponentInChildren<TMP_Text>(true);
         label.text = "Restart";
         restartButton.SetActive(false);
-        Instantiate(Enemy, GetRandomEnemySpawnPosition(), Quaternion.identity);
-        Instantiate(Enemy, GetRandomEnemySpawnPosition(), Quaternion.identity);
-        Instantiate(Enemy, GetRandomEnemySpawnPosition(), Quaternion.identity);
-
     }
 
     void OnMove (InputValue movementValue)
@@ -55,6 +55,7 @@ public class PlayerController : MonoBehaviour
         if (count >= 23) 
         {
             winTextObject.SetActive(true);
+            restartButton.SetActive(true);
             Destroy(GameObject.FindGameObjectWithTag("Enemy"));
         }
    }
@@ -96,7 +97,7 @@ public class PlayerController : MonoBehaviour
 
     Vector3 GetRandomEnemySpawnPosition()
     {
-        const int maxAttempts = 20;
+        const int maxAttempts = 40;
         Vector3 playerPosition = transform.position;
         Vector3 bestCandidate = new Vector3(playerPosition.x, enemySpawnY, playerPosition.z);
         float bestDistance = -1f;
@@ -132,6 +133,7 @@ public class PlayerController : MonoBehaviour
             Destroy(gameObject); 
             winTextObject.gameObject.SetActive(true);
             winTextObject.GetComponent<TextMeshProUGUI>().text = "You Lose!";
+            restartButton.SetActive(true);
             GameObject[] gos = GameObject.FindGameObjectsWithTag("Enemy");
             foreach(GameObject go in gos)
             Destroy(go);
