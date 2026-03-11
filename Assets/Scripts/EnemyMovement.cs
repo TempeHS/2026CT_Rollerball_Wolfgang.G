@@ -40,24 +40,5 @@ public class EnemyMovement : MonoBehaviour
         }
         
     }
-
-       void OnTriggerEnter(Collider other) 
-   {
-        if (other.gameObject.CompareTag("SpeedPickUp")) 
-        {
-            other.gameObject.SetActive(false);
-            StartCoroutine(WaitAndDeactivate());
-        }
-    }
-
-    IEnumerator WaitAndDeactivate()
-    {
-        desiredSpeed = desiredSpeed * 2;
-        yield return new WaitForSeconds(3f);
-        desiredSpeed = TrueSpeed;
-
-    }
-
-
     
 }

@@ -10,6 +10,7 @@ public class PlayerController : MonoBehaviour
     public float TrueSpeed = 0;
     public float speed; 
     public TextMeshProUGUI countText;
+    public TextMeshProUGUI EnemyCountText;
     public GameObject winTextObject;
     public GameObject Enemy;
     public float enemySpawnY = 0.5f;
@@ -18,6 +19,7 @@ public class PlayerController : MonoBehaviour
     public float minEnemySpawnDistanceFromPlayer = 5f;
     private GameObject restartButton;
     public int count;
+    public int EnemyCount;
     public int delayedCount;
     private Rigidbody rb; 
     private float movementX;
@@ -31,9 +33,11 @@ public class PlayerController : MonoBehaviour
         Instantiate(Enemy, GetRandomEnemySpawnPosition(), Quaternion.identity);
         rb = GetComponent <Rigidbody>(); 
         count = 0;
+        EnemyCount = 3;
         delayedCount = count; 
         speed = TrueSpeed;
         SetCountText ();
+        SetEnemyCountText();
         winTextObject.SetActive(false);
         restartButton = GameObject.Find("RestartButton");
         var label = restartButton.GetComponentInChildren<TMP_Text>(true);
@@ -59,6 +63,23 @@ public class PlayerController : MonoBehaviour
             Destroy(GameObject.FindGameObjectWithTag("Enemy"));
         }
    }
+    
+    void SetEnemyCountText ()
+   {
+        EnemyCountText.text = "Enemies: " + EnemyCount.ToString();
+   }
+
+    public void RegisterEnemySpawned()
+    {
+        EnemyCount = EnemyCount + 1;
+        SetEnemyCountText();
+    }
+
+    public void RegisterEnemyDestroyed()
+    {
+        EnemyCount = Mathf.Max(0, EnemyCount - 1);
+        SetEnemyCountText();
+    }
 
     private void FixedUpdate() 
    {
@@ -77,6 +98,7 @@ public class PlayerController : MonoBehaviour
             {
                 delayedCount = count;
                 Instantiate(Enemy, GetRandomEnemySpawnPosition(), Quaternion.identity);
+                RegisterEnemySpawned();
             }
         }
 
@@ -143,6 +165,7 @@ public class PlayerController : MonoBehaviour
     {
             Destroy(gameObject); 
             winTextObject.gameObject.SetActive(true);
+            restartButton.SetActive(true);
             winTextObject.GetComponent<TextMeshProUGUI>().text = "You Lose!";
             GameObject[] gos = GameObject.FindGameObjectsWithTag("Enemy");
             foreach(GameObject go in gos)
