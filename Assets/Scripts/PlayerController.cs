@@ -8,11 +8,8 @@ using System.Collections;
 
 public class PlayerController : MonoBehaviour
 {
-    // Movement and player progression state.
     public float TrueSpeed = 0;
     public float speed; 
-
-    // HUD references.
     public TextMeshProUGUI countText;
     public TextMeshProUGUI EnemyCountText;
     public GameObject winTextObject;
@@ -24,12 +21,11 @@ public class PlayerController : MonoBehaviour
     public Vector2 enemySpawnZRange = new Vector2(-20f, 20f);
     public float minEnemySpawnDistanceFromPlayer = 5f;
 
-    // Runtime references and counters.
     private GameObject restartButton;
     public int count;
     public int EnemyCount;
     public int delayedCount;
-    private Rigidbody rb; 
+    private Rigidbody rb;
     private float movementX;
     private float movementY;
 
@@ -69,7 +65,7 @@ public class PlayerController : MonoBehaviour
    {
        // Update pickup count and trigger the win state once target is reached.
         countText.text = "Count: " + count.ToString();
-        if (count >= 23) 
+        if (count >= 81) 
         {
             winTextObject.SetActive(true);
             restartButton.SetActive(true);
