@@ -925,6 +925,7 @@ GameObject:
   - component: {fileID: 4020343968518589035}
   - component: {fileID: 726699552192716688}
   - component: {fileID: 1461556808822313692}
+  - component: {fileID: 2132319446009734645}
   m_Layer: 0
   m_Name: DTEnemyBody
   m_TagString: Enemy
@@ -980,7 +981,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7429629207129370110}
   serializedVersion: 4
-  m_Mass: 1
+  m_Mass: 100
   m_Drag: 0
   m_AngularDrag: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
@@ -997,7 +998,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 0
+  m_Constraints: 112
   m_CollisionDetection: 0
 --- !u!114 &1461556808822313692
 MonoBehaviour:
@@ -1011,6 +1012,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 242b527e584a68b47a5bbae2f6a65c12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!95 &2132319446009734645
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7429629207129370110}
+  m_Enabled: 1
+  m_Avatar: {fileID: 9000000, guid: 4c5f49f7e44fa4332b4e074f456827cf, type: 3}
+  m_Controller: {fileID: 9100000, guid: cca0cf5321242443b883386c268a9439, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &7614820272559989421
 GameObject:
   m_ObjectHideFlags: 0
@@ -1100,14 +1123,14 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 9185112143296708928}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
   m_LocalPosition: {x: 6.5564394, y: 0.00000047683716, z: 1.780177}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7804888559648798532}
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
 --- !u!195 &3573727686335717591
 NavMeshAgent:
   m_ObjectHideFlags: 0
