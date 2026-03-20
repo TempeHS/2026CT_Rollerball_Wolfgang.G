@@ -8,11 +8,29 @@ using System.Collections;
 
 public class PlayerController : MonoBehaviour
 {
+    // Movement and turning variables.
     public float TrueSpeed = 0;
     public float speed; 
+    public float turnSpeed = 12f;
+    public float sprintMultiplier = 1.75f;
+    private bool isSprinting;
+
+    // Stamina system variables
+    public float MaxStamina = 100f;
+    public float staminaDrainRate = 10f;
+    public float staminaRegenRate= 15f;
+    public float staminaRegenDelay = 2f;
+    public float currentStamina;
+    private float regenDelayTimer;
+    
+
+    // UI elements.
     public TextMeshProUGUI countText;
     public TextMeshProUGUI EnemyCountText;
     public GameObject winTextObject;
+    public GameObject loseTextObject;
+    private GameObject restartButton;
+    public Slider staminaSlider;
 
     // Enemy spawning setup.
     public GameObject DTEnemy;
@@ -21,13 +39,29 @@ public class PlayerController : MonoBehaviour
     public Vector2 enemySpawnZRange = new Vector2(-20f, 20f);
     public float minEnemySpawnDistanceFromPlayer = 5f;
 
-    private GameObject restartButton;
+
     public int count;
     public int EnemyCount;
     public int delayedCount;
     private Rigidbody rb;
     private float movementX;
     private float movementY;
+    private Camera mainCamera;
+
+    public bool IsMovementInputPressed => (movementX * movementX + movementY * movementY) > 0.0001f;
+
+    bool IsSprintInputHeld()
+    {
+        // Prefer direct keyboard state when available to avoid sticky action callbacks.
+        bool keyboardSprintHeld = Keyboard.current != null && Keyboard.current.leftShiftKey.isPressed;
+        if (Keyboard.current != null)
+        {
+            return keyboardSprintHeld;
+        }
+
+        // Fallback for non-keyboard devices that use the Sprint action callback.
+        return isSprinting;
+    }
 
     
     void Start()
@@ -36,20 +70,50 @@ public class PlayerController : MonoBehaviour
         Instantiate(DTEnemy, GetRandomEnemySpawnPosition(), Quaternion.identity);
         Instantiate(DTEnemy, GetRandomEnemySpawnPosition(), Quaternion.identity);
         Instantiate(DTEnemy, GetRandomEnemySpawnPosition(), Quaternion.identity);
+        Debug.Log("Enemies Spawned: 3");
 
-        // Initialize player state and UI.
-        rb = GetComponent <Rigidbody>(); 
-        count = 0;
-        EnemyCount = 3;
-        delayedCount = count; 
-        speed = TrueSpeed;
+        // Initialize UI.
+        rb = GetComponent<Rigidbody>();
+        Debug.Log("Rigibody Initialized");
+        mainCamera = Camera.main;
+        Debug.Log("Camera Initialized");
         SetCountText ();
-        SetEnemyCountText();
+        Debug.Log("Set Count Text");
         winTextObject.SetActive(false);
+        Debug.Log("Set Win Text to false");
+        loseTextObject.SetActive(false);
+        Debug.Log("Set Lose Text to false");
         restartButton = GameObject.Find("RestartButton");
         var label = restartButton.GetComponentInChildren<TMP_Text>(true);
+        Debug.Log("Found Restart Button");
         label.text = "Restart";
+        Debug.Log("Renamed Restart Button");
         restartButton.SetActive(false);
+        Debug.Log("Set Restart Button to false");
+        SetGameplayCursorLock(true);
+        Debug.Log("Locked Cursor");
+
+
+        // Set player starting stats/variables
+        count = 0;
+        delayedCount = count;
+        speed = TrueSpeed;
+        Debug.Log("Set Count to 0");
+        EnemyCount = 3;
+        Debug.Log("Set Enemy Count to 3");
+        SetEnemyCountText();
+        Debug.Log("Set Enemy Count Text");
+        speed = TrueSpeed;
+        Debug.Log("Set Speed to True Speed");
+        currentStamina = MaxStamina;
+        Debug.Log("Current Stamina set to Max Stamina");
+        staminaSlider.maxValue = MaxStamina;
+        Debug.Log("Set Stamina Slider Max Value");
+        staminaSlider.value = MaxStamina;
+        Debug.Log("Set Stamina Slider Value to Max Stamina");
+        regenDelayTimer = 1f;
+        Debug.Log("Regeneration Delay Timer set to 1 second");
+
     }
 
     void OnMove (InputValue movementValue)
@@ -61,6 +125,12 @@ public class PlayerController : MonoBehaviour
    
    }
 
+   void OnSprint(InputValue value)
+   {
+       // Action callback support (useful for non-keyboard devices).
+       isSprinting = value.isPressed;
+   }
+
    void SetCountText ()
    {
        // Update pickup count and trigger the win state once target is reached.
@@ -69,7 +139,12 @@ public class PlayerController : MonoBehaviour
         {
             winTextObject.SetActive(true);
             restartButton.SetActive(true);
-            Destroy(GameObject.FindGameObjectWithTag("Enemy"));
+            SetGameplayCursorLock(false);
+            GameObject[] gos = GameObject.FindGameObjectsWithTag("Enemy");
+            foreach(GameObject go in gos)
+            Destroy(go);
+
+        Destroy(gameObject);
         }
    }
     
@@ -93,12 +168,70 @@ public class PlayerController : MonoBehaviour
         SetEnemyCountText();
     }
 
-    private void FixedUpdate() 
-   {
-           // Apply force in physics step so movement stays consistent with Rigidbody simulation.
-        Vector3 movement = new Vector3 (movementX, 0.0f, movementY);
-        rb.AddForce(movement * speed); 
-   }
+    public void Update()
+    {
+        // Ask the shared helper whether sprint is being held this frame.
+        bool sprintInputHeld = IsSprintInputHeld();
+
+        if (sprintInputHeld && currentStamina > 0f)
+        {
+            currentStamina -= staminaDrainRate * Time.deltaTime;
+            regenDelayTimer = staminaRegenDelay;
+        }
+        else
+        {
+            // Wait briefly after sprinting ends, then refill up to the maximum.
+            if (regenDelayTimer > 0f)
+            {
+                regenDelayTimer -= Time.deltaTime;
+            }
+            else if (currentStamina < MaxStamina)
+            {
+                currentStamina += staminaRegenRate * Time.deltaTime;
+            }
+        }
+
+        // Clamp value so it stays between 0 and max
+        currentStamina = Mathf.Clamp(currentStamina, 0, MaxStamina);
+        staminaSlider.value = currentStamina;
+    }
+
+
+    private void FixedUpdate()
+    {
+        // Build a movement direction relative to the camera's horizontal facing
+        Transform cameraTransform = mainCamera != null ? mainCamera.transform : null;
+        Vector3 camForward = cameraTransform != null ? cameraTransform.forward : Vector3.forward;
+        Vector3 camRight   = cameraTransform != null ? cameraTransform.right : Vector3.right;
+        camForward.y = 0f;
+        camRight.y   = 0f;
+        camForward.Normalize();
+        camRight.Normalize();
+
+        Vector3 movement = camForward * movementY + camRight * movementX;
+
+        bool canSprint = IsSprintInputHeld() && currentStamina > 0f;
+        float currentSpeed = canSprint ? speed * sprintMultiplier : speed;
+        Vector3 targetVelocity = movement * currentSpeed;
+        Vector3 currentVelocity = rb.linearVelocity;
+        
+        // Acceleration/Deceleration when turning and moving
+        float acceleration = 0.20f;
+        Vector3 newHorizontalVelocity = Vector3.Lerp(
+            new Vector3(currentVelocity.x, 0f, currentVelocity.z),
+            targetVelocity,
+            acceleration
+        );
+        
+        rb.linearVelocity = newHorizontalVelocity + new Vector3(0f, currentVelocity.y, 0f);
+
+        // Face the direction of movement
+        if (movement.sqrMagnitude > 0.001f)
+        {
+            Quaternion targetRotation = Quaternion.LookRotation(movement, Vector3.up);
+            rb.MoveRotation(Quaternion.Slerp(rb.rotation, targetRotation, turnSpeed * Time.fixedDeltaTime));
+        }
+    }
 
     void OnTriggerEnter(Collider other) 
    {
@@ -127,7 +260,7 @@ public class PlayerController : MonoBehaviour
     IEnumerator WaitAndDeactivate()
     {
         // Temporary buff that always returns to base speed.
-        speed = speed * 2;
+        speed = speed * 1.5f;
         yield return new WaitForSeconds(3f);
         speed = TrueSpeed;
 
@@ -188,27 +321,33 @@ public class PlayerController : MonoBehaviour
         // Losing condition: touching any enemy ends the run.
         if (collision.gameObject.CompareTag("Enemy"))
     {
-            
-            Destroy(gameObject); 
-            winTextObject.gameObject.SetActive(true);
-            winTextObject.GetComponent<TextMeshProUGUI>().text = "You Lose!";
-            restartButton.SetActive(true);
-            GameObject[] gos = GameObject.FindGameObjectsWithTag("Enemy");
-            foreach(GameObject go in gos)
-            Destroy(go);
+            LoseGame();
     }
 
         // Losing condition: falling into the death volume also ends the run.
         if (collision.gameObject.CompareTag("DeathBox"))
     {
-            Destroy(gameObject); 
-            winTextObject.gameObject.SetActive(true);
-            restartButton.SetActive(true);
-            winTextObject.GetComponent<TextMeshProUGUI>().text = "You Lose!";
-            GameObject[] gos = GameObject.FindGameObjectsWithTag("Enemy");
-            foreach(GameObject go in gos)
-            Destroy(go);
+            LoseGame();
     }
+    }
+
+    void LoseGame()
+    {
+        loseTextObject.gameObject.SetActive(true);
+        restartButton.SetActive(true);
+        SetGameplayCursorLock(false);
+
+        GameObject[] gos = GameObject.FindGameObjectsWithTag("Enemy");
+        foreach(GameObject go in gos)
+            Destroy(go);
+
+        Destroy(gameObject);
+    }
+
+    void SetGameplayCursorLock(bool shouldLock)
+    {
+        Cursor.lockState = shouldLock ? CursorLockMode.Locked : CursorLockMode.None;
+        Cursor.visible = !shouldLock;
     }
 
 }
