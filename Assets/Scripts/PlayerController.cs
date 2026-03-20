@@ -10,6 +10,9 @@ public class PlayerController : MonoBehaviour
 {
     public float TrueSpeed = 0;
     public float speed; 
+    public float turnSpeed = 12f;
+    public float sprintMultiplier = 1.8f;
+    private bool isSprinting;
     public TextMeshProUGUI countText;
     public TextMeshProUGUI EnemyCountText;
     public GameObject winTextObject;
@@ -28,6 +31,9 @@ public class PlayerController : MonoBehaviour
     private Rigidbody rb;
     private float movementX;
     private float movementY;
+    private Camera mainCamera;
+
+    public bool IsMovementInputPressed => (movementX * movementX + movementY * movementY) > 0.0001f;
 
     
     void Start()
@@ -38,7 +44,10 @@ public class PlayerController : MonoBehaviour
         Instantiate(DTEnemy, GetRandomEnemySpawnPosition(), Quaternion.identity);
 
         // Initialize player state and UI.
-        rb = GetComponent <Rigidbody>(); 
+        rb = GetComponent<Rigidbody>();
+        mainCamera = Camera.main;
+        // Keep physics from tipping the player while still allowing yaw turning.
+        rb.constraints |= RigidbodyConstraints.FreezeRotationX | RigidbodyConstraints.FreezeRotationZ;
         count = 0;
         EnemyCount = 3;
         delayedCount = count; 
@@ -50,6 +59,7 @@ public class PlayerController : MonoBehaviour
         var label = restartButton.GetComponentInChildren<TMP_Text>(true);
         label.text = "Restart";
         restartButton.SetActive(false);
+        SetGameplayCursorLock(true);
     }
 
     void OnMove (InputValue movementValue)
@@ -61,6 +71,12 @@ public class PlayerController : MonoBehaviour
    
    }
 
+   void OnSprint(InputValue value)
+   {
+       // Action callback support (useful for non-keyboard devices).
+       isSprinting = value.isPressed;
+   }
+
    void SetCountText ()
    {
        // Update pickup count and trigger the win state once target is reached.
@@ -69,6 +85,7 @@ public class PlayerController : MonoBehaviour
         {
             winTextObject.SetActive(true);
             restartButton.SetActive(true);
+            SetGameplayCursorLock(false);
             Destroy(GameObject.FindGameObjectWithTag("Enemy"));
         }
    }
@@ -93,12 +110,44 @@ public class PlayerController : MonoBehaviour
         SetEnemyCountText();
     }
 
-    private void FixedUpdate() 
-   {
-           // Apply force in physics step so movement stays consistent with Rigidbody simulation.
-        Vector3 movement = new Vector3 (movementX, 0.0f, movementY);
-        rb.AddForce(movement * speed); 
-   }
+    private void FixedUpdate()
+    {
+        // Build a movement direction relative to the camera's horizontal facing.
+        Transform cameraTransform = mainCamera != null ? mainCamera.transform : null;
+        Vector3 camForward = cameraTransform != null ? cameraTransform.forward : Vector3.forward;
+        Vector3 camRight   = cameraTransform != null ? cameraTransform.right : Vector3.right;
+        camForward.y = 0f;
+        camRight.y   = 0f;
+        camForward.Normalize();
+        camRight.Normalize();
+
+        Vector3 movement = camForward * movementY + camRight * movementX;
+        
+        // Applies the movement to the player
+        bool sprintHeldFromKeyboard = Keyboard.current != null &&
+                          (Keyboard.current.leftShiftKey.isPressed || Keyboard.current.rightShiftKey.isPressed);
+        bool sprintHeld = sprintHeldFromKeyboard || (Keyboard.current == null && isSprinting);
+        float currentSpeed = sprintHeld ? speed * sprintMultiplier : speed;
+        Vector3 targetVelocity = movement * currentSpeed;
+        Vector3 currentVelocity = rb.linearVelocity;
+        
+        // Acceleration/Deceleration when turning and moving.
+        float acceleration = 0.20f;
+        Vector3 newHorizontalVelocity = Vector3.Lerp(
+            new Vector3(currentVelocity.x, 0f, currentVelocity.z),
+            targetVelocity,
+            acceleration
+        );
+        
+        rb.linearVelocity = newHorizontalVelocity + new Vector3(0f, currentVelocity.y, 0f);
+
+        // Face the direction of travel when there is meaningful movement input.
+        if (movement.sqrMagnitude > 0.001f)
+        {
+            Quaternion targetRotation = Quaternion.LookRotation(movement, Vector3.up);
+            rb.MoveRotation(Quaternion.Slerp(rb.rotation, targetRotation, turnSpeed * Time.fixedDeltaTime));
+        }
+    }
 
     void OnTriggerEnter(Collider other) 
    {
@@ -117,11 +166,11 @@ public class PlayerController : MonoBehaviour
         }
 
         // Speed pickup: apply temporary speed boost.
-        if (other.gameObject.CompareTag("SpeedPickUp")) 
-        {
-            other.gameObject.SetActive(false);
-            StartCoroutine(WaitAndDeactivate());
-        }
+        // if (other.gameObject.CompareTag("SpeedPickUp")) 
+        // {
+        //     other.gameObject.SetActive(false);
+        //     StartCoroutine(WaitAndDeactivate());
+        // }
     }
 
     IEnumerator WaitAndDeactivate()
@@ -188,27 +237,34 @@ public class PlayerController : MonoBehaviour
         // Losing condition: touching any enemy ends the run.
         if (collision.gameObject.CompareTag("Enemy"))
     {
-            
-            Destroy(gameObject); 
-            winTextObject.gameObject.SetActive(true);
-            winTextObject.GetComponent<TextMeshProUGUI>().text = "You Lose!";
-            restartButton.SetActive(true);
-            GameObject[] gos = GameObject.FindGameObjectsWithTag("Enemy");
-            foreach(GameObject go in gos)
-            Destroy(go);
+            LoseGame();
     }
 
         // Losing condition: falling into the death volume also ends the run.
         if (collision.gameObject.CompareTag("DeathBox"))
     {
-            Destroy(gameObject); 
-            winTextObject.gameObject.SetActive(true);
-            restartButton.SetActive(true);
-            winTextObject.GetComponent<TextMeshProUGUI>().text = "You Lose!";
-            GameObject[] gos = GameObject.FindGameObjectsWithTag("Enemy");
-            foreach(GameObject go in gos)
-            Destroy(go);
+            LoseGame();
     }
+    }
+
+    void LoseGame()
+    {
+        winTextObject.gameObject.SetActive(true);
+        winTextObject.GetComponent<TextMeshProUGUI>().text = "You Lose!";
+        restartButton.SetActive(true);
+        SetGameplayCursorLock(false);
+
+        GameObject[] gos = GameObject.FindGameObjectsWithTag("Enemy");
+        foreach(GameObject go in gos)
+            Destroy(go);
+
+        Destroy(gameObject);
+    }
+
+    void SetGameplayCursorLock(bool shouldLock)
+    {
+        Cursor.lockState = shouldLock ? CursorLockMode.Locked : CursorLockMode.None;
+        Cursor.visible = !shouldLock;
     }
 
 }
