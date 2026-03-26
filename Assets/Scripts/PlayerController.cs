@@ -13,7 +13,9 @@ public class PlayerController : MonoBehaviour
     public float speed; 
     public float turnSpeed = 12f;
     public float sprintMultiplier = 1.75f;
+    public float jumpForce = 7f;
     private bool isSprinting;
+
 
     // Stamina system variables
     public float MaxStamina = 100f;
@@ -61,6 +63,12 @@ public class PlayerController : MonoBehaviour
 
         // Fallback for non-keyboard devices that use the Sprint action callback.
         return isSprinting;
+    }
+
+    bool IsGrounded()
+    {
+        float rayLength = 0.6f;
+        return Physics.Raycast(transform.position, Vector3.down, rayLength);
     }
 
     
@@ -129,6 +137,15 @@ public class PlayerController : MonoBehaviour
    {
        // Action callback support (useful for non-keyboard devices).
        isSprinting = value.isPressed;
+   }
+
+   void OnJump(InputValue value)
+   {
+       // Apply an upward force
+       if (value.isPressed && IsGrounded())
+       {
+           rb.linearVelocity = new Vector3(rb.linearVelocity.x, jumpForce, rb.linearVelocity.z);
+       }
    }
 
    void SetCountText ()
@@ -212,18 +229,19 @@ public class PlayerController : MonoBehaviour
 
         bool canSprint = IsSprintInputHeld() && currentStamina > 0f;
         float currentSpeed = canSprint ? speed * sprintMultiplier : speed;
-        Vector3 targetVelocity = movement * currentSpeed;
         Vector3 currentVelocity = rb.linearVelocity;
+        Vector3 currentHorizontalVelocity = new Vector3(currentVelocity.x, 0f, currentVelocity.z);
+        Vector3 targetHorizontalVelocity = movement * currentSpeed;
         
         // Acceleration/Deceleration when turning and moving
         float acceleration = 0.20f;
         Vector3 newHorizontalVelocity = Vector3.Lerp(
-            new Vector3(currentVelocity.x, 0f, currentVelocity.z),
-            targetVelocity,
+            currentHorizontalVelocity,
+            targetHorizontalVelocity,
             acceleration
         );
-        
-        rb.linearVelocity = newHorizontalVelocity + new Vector3(0f, currentVelocity.y, 0f);
+
+        rb.linearVelocity = new Vector3(newHorizontalVelocity.x, currentVelocity.y, newHorizontalVelocity.z);
 
         // Face the direction of movement
         if (movement.sqrMagnitude > 0.001f)
@@ -253,17 +271,8 @@ public class PlayerController : MonoBehaviour
         if (other.gameObject.CompareTag("SpeedPickUp")) 
         {
             other.gameObject.SetActive(false);
-            StartCoroutine(WaitAndDeactivate());
+            currentStamina = MaxStamina;
         }
-    }
-
-    IEnumerator WaitAndDeactivate()
-    {
-        // Temporary buff that always returns to base speed.
-        speed = speed * 1.5f;
-        yield return new WaitForSeconds(3f);
-        speed = TrueSpeed;
-
     }
 
     Vector3 GetRandomEnemySpawnPosition()
