@@ -24,6 +24,14 @@ public class PlayerController : MonoBehaviour
     public float staminaRegenDelay = 2f;
     public float currentStamina;
     private float regenDelayTimer;
+
+
+    // Mana system variables
+    public float MaxMana = 100f;
+    public float manaRegenRate= 15f;
+    public float manaRegenDelay = 2f;
+    public float currentMana;
+    private float manaRegenDelayTimer;
     
 
     // UI elements.
@@ -33,6 +41,7 @@ public class PlayerController : MonoBehaviour
     public GameObject loseTextObject;
     private GameObject restartButton;
     public Slider staminaSlider;
+    public Slider manaSlider;
 
     // Enemy spawning setup.
     public GameObject DTEnemy;
@@ -49,6 +58,8 @@ public class PlayerController : MonoBehaviour
     private float movementX;
     private float movementY;
     private Camera mainCamera;
+    public GameObject PlayerBullet;
+
 
     public bool IsMovementInputPressed => (movementX * movementX + movementY * movementY) > 0.0001f;
 
@@ -113,6 +124,7 @@ public class PlayerController : MonoBehaviour
         Debug.Log("Set Enemy Count Text");
         speed = TrueSpeed;
         Debug.Log("Set Speed to True Speed");
+        
         currentStamina = MaxStamina;
         Debug.Log("Current Stamina set to Max Stamina");
         staminaSlider.maxValue = MaxStamina;
@@ -121,6 +133,15 @@ public class PlayerController : MonoBehaviour
         Debug.Log("Set Stamina Slider Value to Max Stamina");
         regenDelayTimer = 1f;
         Debug.Log("Regeneration Delay Timer set to 1 second");
+
+        currentMana = MaxMana;
+        Debug.Log("Current Mana set to Max Mana");
+        manaSlider.maxValue = MaxMana;
+        Debug.Log("Set Mana Slider Max Value");
+        manaSlider.value = MaxMana;
+        Debug.Log("Set Mana Slider Value to Max Mana");
+        manaRegenDelayTimer = 1f;
+        Debug.Log("Mana Regeneration Delay Timer set to 1 second");
 
     }
 
@@ -144,8 +165,24 @@ public class PlayerController : MonoBehaviour
        // Apply an upward force
        if (value.isPressed && IsGrounded())
        {
-           rb.linearVelocity = new Vector3(rb.linearVelocity.x, jumpForce, rb.linearVelocity.z);
+            if (currentStamina >= 20f)
+            {
+                rb.linearVelocity = new Vector3(rb.linearVelocity.x, jumpForce, rb.linearVelocity.z);
+                currentStamina = currentStamina - 20f; 
+            }
        }
+   }
+
+   void OnClick(InputValue value)
+   {
+        if (value.isPressed)
+        {   if (currentMana >= 25f)
+            {
+                currentMana = currentMana - 25f;
+                Instantiate(PlayerBullet, transform.position + transform.forward * 1.2f, transform.rotation);
+                manaRegenDelayTimer = manaRegenDelay;
+            }  
+        }
    }
 
    void SetCountText ()
@@ -211,6 +248,21 @@ public class PlayerController : MonoBehaviour
         // Clamp value so it stays between 0 and max
         currentStamina = Mathf.Clamp(currentStamina, 0, MaxStamina);
         staminaSlider.value = currentStamina;
+
+        // Mana regeneration
+        if (manaRegenDelayTimer > 0f)
+        {
+            manaRegenDelayTimer -= Time.deltaTime;
+        }
+        else if (currentMana < MaxMana)
+        {
+            currentMana += manaRegenRate * Time.deltaTime;
+        }
+
+        // Clamp value so it stays between 0 and max
+        currentMana = Mathf.Clamp(currentMana, 0, MaxMana);
+        manaSlider.value = currentMana;
+
     }
 
 

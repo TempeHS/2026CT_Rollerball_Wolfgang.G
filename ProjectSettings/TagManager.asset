@@ -8,6 +8,7 @@ TagManager:
   - Enemy
   - DeathBox
   - SpeedPickUp
+  - Projectile
   layers:
   - Default
   - TransparentFX

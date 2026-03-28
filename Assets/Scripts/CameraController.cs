@@ -22,6 +22,8 @@ public class CameraController : MonoBehaviour
 
     void LateUpdate()
     {
+        if (player != null)
+        {
         _yaw   += Input.GetAxis("Mouse X") * mouseSensitivity;
         _pitch -= Input.GetAxis("Mouse Y") * mouseSensitivity;
         _pitch  = Mathf.Clamp(_pitch, minPitch, maxPitch);
@@ -29,6 +31,7 @@ public class CameraController : MonoBehaviour
         Quaternion rotation = Quaternion.Euler(_pitch, _yaw, 0f);
         transform.position  = player.transform.position + rotation * new Vector3(0f, 0f, -distance);
         transform.rotation  = rotation;
+        }
     }
 }
 
