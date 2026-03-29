@@ -71,11 +71,6 @@ MonoBehaviour:
   TrueSpeed: 10
   desiredSpeed: 0
   maxPredictionTime: 1.5
-  guardingRange: 25
-  cacheUpdateInterval: 2
-  chaseRange: 3.5
-  orbitRadius: 2
-  orbitSpeed: 1.5
 --- !u!1001 &2112085054868164405
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -145,6 +140,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: f4b5ec9597a2c4b438f938052d696e0b, type: 3}
       insertIndex: -1
       addedObject: {fileID: 681169859757449737}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: f4b5ec9597a2c4b438f938052d696e0b, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3226484671210561821}
   m_SourcePrefab: {fileID: 100100000, guid: f4b5ec9597a2c4b438f938052d696e0b, type: 3}
 --- !u!1 &1265172824819577444 stripped
 GameObject:
@@ -223,6 +221,18 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 112
   m_CollisionDetection: 0
+--- !u!114 &3226484671210561821
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1265172824819577444}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8d5c126b2c72ee441acca4b8e7b260fc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!4 &1928978078968146142 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: f4b5ec9597a2c4b438f938052d696e0b, type: 3}
