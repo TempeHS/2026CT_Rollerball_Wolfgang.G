@@ -8,7 +8,7 @@ using System.Collections;
 
 public class PlayerController : MonoBehaviour
 {
-    // Movement and turning variables.
+    // Movement and turning variables
     public float TrueSpeed = 0;
     public float speed; 
     public float turnSpeed = 12f;
@@ -16,6 +16,10 @@ public class PlayerController : MonoBehaviour
     public float jumpForce = 7f;
     private bool isSprinting;
 
+    // Aiming variables
+    private bool isAiming = false;
+    public float aimMoveMultiplier = 0.65f;
+    public float aimTurnSpeed = 20f;
 
     // Stamina system variables
     public float MaxStamina = 100f;
@@ -86,9 +90,9 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         // Spawn the initial wave of enemies.
-        Instantiate(DTEnemy, GetRandomEnemySpawnPosition(), Quaternion.identity);
-        Instantiate(DTEnemy, GetRandomEnemySpawnPosition(), Quaternion.identity);
-        Instantiate(DTEnemy, GetRandomEnemySpawnPosition(), Quaternion.identity);
+        // Instantiate(DTEnemy, GetRandomEnemySpawnPosition(), Quaternion.identity);
+        // Instantiate(DTEnemy, GetRandomEnemySpawnPosition(), Quaternion.identity);
+        // Instantiate(DTEnemy, GetRandomEnemySpawnPosition(), Quaternion.identity);
         Debug.Log("Enemies Spawned: 3");
 
         // Initialize UI.
@@ -179,10 +183,21 @@ public class PlayerController : MonoBehaviour
         {   if (currentMana >= 25f)
             {
                 currentMana = currentMana - 25f;
-                Instantiate(PlayerBullet, transform.position + transform.forward * 1.2f, transform.rotation);
-                manaRegenDelayTimer = manaRegenDelay;
+                StartCoroutine(SpawnBullet());
             }  
         }
+   }
+
+    private System.Collections.IEnumerator SpawnBullet()
+    {
+        yield return new WaitForSeconds(1f);
+        Instantiate(PlayerBullet, transform.position + transform.forward * 1.2f, transform.rotation);
+        manaRegenDelayTimer = manaRegenDelay;
+    }
+
+   void OnRightClick(InputValue value)
+   {
+        isAiming = value.isPressed;
    }
 
    void SetCountText ()
@@ -281,6 +296,13 @@ public class PlayerController : MonoBehaviour
 
         bool canSprint = IsSprintInputHeld() && currentStamina > 0f;
         float currentSpeed = canSprint ? speed * sprintMultiplier : speed;
+
+        // Aiming
+        if (isAiming == true)
+        {
+            currentSpeed *= aimMoveMultiplier;
+        }
+
         Vector3 currentVelocity = rb.linearVelocity;
         Vector3 currentHorizontalVelocity = new Vector3(currentVelocity.x, 0f, currentVelocity.z);
         Vector3 targetHorizontalVelocity = movement * currentSpeed;
@@ -301,6 +323,24 @@ public class PlayerController : MonoBehaviour
             Quaternion targetRotation = Quaternion.LookRotation(movement, Vector3.up);
             rb.MoveRotation(Quaternion.Slerp(rb.rotation, targetRotation, turnSpeed * Time.fixedDeltaTime));
         }
+
+        // More Aiming
+        if (isAiming && cameraTransform != null)
+        {
+            Vector3 aimForward = cameraTransform.forward;
+            aimForward.y = 0f;
+
+            if (aimForward.sqrMagnitude > 0.001f)
+            {
+                Quaternion targetRotation = Quaternion.LookRotation(aimForward, Vector3.up);
+                rb.MoveRotation(Quaternion.Slerp(rb.rotation, targetRotation, aimTurnSpeed * Time.fixedDeltaTime));
+            }
+        }
+        else if (movement.sqrMagnitude > 0.001f)
+        {
+            Quaternion targetRotation = Quaternion.LookRotation(movement, Vector3.up);
+            rb.MoveRotation(Quaternion.Slerp(rb.rotation, targetRotation, turnSpeed * Time.fixedDeltaTime));
+        }
     }
 
     void OnTriggerEnter(Collider other) 
@@ -314,7 +354,7 @@ public class PlayerController : MonoBehaviour
             if (count >= delayedCount + 3)
             {
                 delayedCount = count;
-                Instantiate(DTEnemy, GetRandomEnemySpawnPosition(), Quaternion.identity);
+                // Instantiate(DTEnemy, GetRandomEnemySpawnPosition(), Quaternion.identity);
                 RegisterEnemySpawned();
             }
         }
