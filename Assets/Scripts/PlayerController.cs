@@ -32,8 +32,8 @@ public class PlayerController : MonoBehaviour
 
     // Mana system variables
     public float MaxMana = 100f;
-    public float manaRegenRate= 15f;
-    public float manaRegenDelay = 2f;
+    public float manaRegenRate= 5f;
+    public float manaRegenDelay = 3f;
     public float currentMana;
     private float manaRegenDelayTimer;
     
@@ -90,9 +90,9 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         // Spawn the initial wave of enemies.
-        // Instantiate(DTEnemy, GetRandomEnemySpawnPosition(), Quaternion.identity);
-        // Instantiate(DTEnemy, GetRandomEnemySpawnPosition(), Quaternion.identity);
-        // Instantiate(DTEnemy, GetRandomEnemySpawnPosition(), Quaternion.identity);
+        Instantiate(DTEnemy, GetRandomEnemySpawnPosition(), Quaternion.identity);
+        Instantiate(DTEnemy, GetRandomEnemySpawnPosition(), Quaternion.identity);
+        Instantiate(DTEnemy, GetRandomEnemySpawnPosition(), Quaternion.identity);
         Debug.Log("Enemies Spawned: 3");
 
         // Initialize UI.
@@ -122,31 +122,39 @@ public class PlayerController : MonoBehaviour
         delayedCount = count;
         speed = TrueSpeed;
         Debug.Log("Set Count to 0");
+
         EnemyCount = 3;
         Debug.Log("Set Enemy Count to 3");
+        
         SetEnemyCountText();
         Debug.Log("Set Enemy Count Text");
+
         speed = TrueSpeed;
         Debug.Log("Set Speed to True Speed");
         
         currentStamina = MaxStamina;
         Debug.Log("Current Stamina set to Max Stamina");
+        
         staminaSlider.maxValue = MaxStamina;
         Debug.Log("Set Stamina Slider Max Value");
+
         staminaSlider.value = MaxStamina;
         Debug.Log("Set Stamina Slider Value to Max Stamina");
+
         regenDelayTimer = 1f;
         Debug.Log("Regeneration Delay Timer set to 1 second");
 
         currentMana = MaxMana;
         Debug.Log("Current Mana set to Max Mana");
+
         manaSlider.maxValue = MaxMana;
         Debug.Log("Set Mana Slider Max Value");
+
         manaSlider.value = MaxMana;
         Debug.Log("Set Mana Slider Value to Max Mana");
+
         manaRegenDelayTimer = 1f;
         Debug.Log("Mana Regeneration Delay Timer set to 1 second");
-
     }
 
     void OnMove (InputValue movementValue)
@@ -169,10 +177,10 @@ public class PlayerController : MonoBehaviour
        // Apply an upward force
        if (value.isPressed && IsGrounded())
        {
-            if (currentStamina >= 20f)
+            if (currentStamina >= 15f)
             {
                 rb.linearVelocity = new Vector3(rb.linearVelocity.x, jumpForce, rb.linearVelocity.z);
-                currentStamina = currentStamina - 20f; 
+                currentStamina = currentStamina - 15f; 
             }
        }
    }
@@ -190,8 +198,12 @@ public class PlayerController : MonoBehaviour
 
     private System.Collections.IEnumerator SpawnBullet()
     {
-        yield return new WaitForSeconds(1f);
-        Instantiate(PlayerBullet, transform.position + transform.forward * 1.2f, transform.rotation);
+        yield return new WaitForSeconds(0.5f);
+
+        Vector3 spawnPos = transform.position + transform.forward * 1.2f;
+        spawnPos.y = 1.4f;
+
+        Instantiate(PlayerBullet, spawnPos, transform.rotation);
         manaRegenDelayTimer = manaRegenDelay;
     }
 
@@ -219,7 +231,7 @@ public class PlayerController : MonoBehaviour
     
     void SetEnemyCountText ()
    {
-           // Keep enemy counter text in sync with tracked enemy count.
+        // Keep enemy counter text in sync with tracked enemy count.
         EnemyCountText.text = "Enemies: " + EnemyCount.ToString();
    }
 
@@ -354,7 +366,7 @@ public class PlayerController : MonoBehaviour
             if (count >= delayedCount + 3)
             {
                 delayedCount = count;
-                // Instantiate(DTEnemy, GetRandomEnemySpawnPosition(), Quaternion.identity);
+                Instantiate(DTEnemy, GetRandomEnemySpawnPosition(), Quaternion.identity);
                 RegisterEnemySpawned();
             }
         }
