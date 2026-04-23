@@ -23,6 +23,7 @@ public class EnemyMovement : MonoBehaviour
     {
         navMeshAgent = GetComponent<NavMeshAgent>();
         GameObject playerObj = GameObject.FindWithTag("Player");
+        
 
         if (playerObj == null || navMeshAgent == null)
         {
@@ -77,5 +78,11 @@ public class EnemyMovement : MonoBehaviour
             default:
                 return thisPlayer.position;
         }
+    }
+
+    void OnDestroy()
+    {
+        // Clamp to zero so UI never shows negative enemy counts.
+        EnemyCount = Mathf.Max(0, PlayerController.EnemyCount - 1);
     }
 }
