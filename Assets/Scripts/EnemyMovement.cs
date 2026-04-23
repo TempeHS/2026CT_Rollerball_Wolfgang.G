@@ -80,9 +80,5 @@ public class EnemyMovement : MonoBehaviour
         }
     }
 
-    void OnDestroy()
-    {
-        // Clamp to zero so UI never shows negative enemy counts.
-        EnemyCount = Mathf.Max(0, PlayerController.EnemyCount - 1);
-    }
+
 }
