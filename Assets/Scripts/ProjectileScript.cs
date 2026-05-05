@@ -15,7 +15,6 @@ public class ProjectileScript : MonoBehaviour
 
 private void OnCollisionEnter(Collision collision)
     {
-        // Losing condition: touching any enemy ends the run.
         if (collision.gameObject.CompareTag("Enemy"))
     {
         Destroy(collision.gameObject);

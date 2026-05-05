@@ -56,6 +56,7 @@ public class PlayerController : MonoBehaviour
 
 
     public int count;
+    private int WinningCount = 100;
     public int EnemyCount;
     public int delayedCount;
     private Rigidbody rb;
@@ -119,6 +120,8 @@ public class PlayerController : MonoBehaviour
 
         // Set player starting stats/variables
         count = 0;
+        Pickup_Script PS = FindFirstObjectByType<Pickup_Script>();
+        WinningCount = PS.pickUpCount;
         delayedCount = count;
         speed = TrueSpeed;
         Debug.Log("Set Count to 0");
@@ -214,9 +217,10 @@ public class PlayerController : MonoBehaviour
 
    void SetCountText ()
    {
+
        // Update pickup count and trigger the win state once target is reached.
         countText.text = "Count: " + count.ToString();
-        if (count >= 81) 
+        if (count >= WinningCount) 
         {
             winTextObject.SetActive(true);
             restartButton.SetActive(true);
