@@ -385,7 +385,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 24858869}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 7a5ac11cc976e418e8d13136b07e1f52, type: 3}
   m_Name: 
@@ -2635,7 +2635,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6158b064f4e8e49bd8b27aa23b31a9bc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pickUpPrefab: {fileID: 1887062109751967338, guid: 80e20a039db985d47924d28687cb8202, type: 3}
+  pickUpPrefab: {fileID: 932005721254611041, guid: 50a22c05076edcd4b916e838039dd168, type: 3}
   staminaPickupPrefab: {fileID: 3757840065097991837, guid: 7a7cbda0feae9fd46b2787586ee92aa0, type: 3}
   pickUpTag: PickUp
   staminaPickUpTag: staminaPickup
